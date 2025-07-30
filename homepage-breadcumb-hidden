@@ -1,0 +1,3 @@
+body.home .container-fluid.head-bread {
+  display: none !important;
+}
