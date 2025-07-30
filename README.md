@@ -13,6 +13,7 @@ This repository contains custom PHP snippets I've written for WordPress projects
 # HTML
 - HTML for Search Toggle
 - HTML Cart count
+- HTML Mobile Search
 
 # CSS
 - css cart icon
