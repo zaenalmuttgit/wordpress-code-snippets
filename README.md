@@ -7,6 +7,7 @@ This repository contains custom PHP snippets I've written for WordPress projects
 - Inject Product Schema Markup
 - Add X-Content-Type-Options
 - Redirect Product Feed
+- Shortcode for dinamic FAQ Category
 
 Each snippet is tested and optimized for performance and security.
 
