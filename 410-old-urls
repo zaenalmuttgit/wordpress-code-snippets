@@ -1,0 +1,54 @@
+add_action('template_redirect', function () {
+    $request_uri  = $_SERVER['REQUEST_URI'];
+    $request_path = parse_url($request_uri, PHP_URL_PATH);
+    $gone_file    = get_stylesheet_directory() . '/gone-urls.txt';
+
+	// List of categories you want to apply 410 to for pagination
+    $categories = ['stickers', 'wall-clock-round', 'wall-clock-square'];
+    $pattern = '#^/(' . implode('|', array_map('preg_quote', $categories)) . ')/\?page=\d+$#';
+
+    if (preg_match($pattern, $request_uri)) {
+        status_header(410);
+        nocache_headers();
+        echo '<h1>410 Gone</h1><p>This page has been permanently removed.</p>';
+        exit;
+    }
+
+    // 1. Handle manual 410 from gone-urls.txt
+    if (file_exists($gone_file)) {
+        $gone_urls = file($gone_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (in_array($request_path, array_map('trim', $gone_urls), true)) {
+            status_header(410);
+            nocache_headers();
+            echo '<h1>410 Gone</h1><p>This page has been permanently removed.</p>';
+            exit;
+        }
+    }
+
+    // 2. Handle automatic 410 for ?setCurrencyId=...
+    if (!is_admin() && isset($_GET['setCurrencyId'])) {
+        status_header(410);
+        nocache_headers();
+        echo '<h1>410 Gone</h1><p>This page has been permanently removed.</p>';
+        exit;
+    }
+
+    // 3. Handle 410 for malformed path patterns
+    $bad_patterns = [
+        'mps-precision.com',
+        'www.vaboomer.com',
+        'vaboomer.com',
+        'flyriver.com',
+        'www.rks-software.com'
+        // Tambahkan pola lainnya di sini jika ditemukan
+    ];
+
+    foreach ($bad_patterns as $pattern) {
+        if (strpos($request_uri, $pattern) !== false) {
+            status_header(410);
+            nocache_headers();
+            echo '<h1>410 Gone</h1><p>This malformed page has been removed.</p>';
+            exit;
+        }
+    }
+});
