@@ -1,0 +1,36 @@
+function render_category_faq() {
+    if (is_product_category()) {
+        $category = get_queried_object();
+
+        if (have_rows('faq_list_category', 'term_' . $category->term_id)) {
+            ob_start();
+            echo '<section class="product-faq">';
+            echo '<ul class="faq-list">';
+
+            while (have_rows('faq_list_category', 'term_' . $category->term_id)) {
+                the_row();
+                $question = get_sub_field('question_category');
+                $answer = get_sub_field('answer_category');
+
+                if (empty(trim($question)) || empty(trim(strip_tags($answer)))) {
+                    continue;
+                }
+
+                $clean_answer = preg_replace('/<p>(\s|&nbsp;|<br\s*\/?>|\.)*<\/p>/i', '', $answer);
+
+                echo '<li class="faq-item">';
+                echo '<strong>' . esc_html($question) . '</strong>';
+                echo '<div class="faq-answer">' . wp_kses_post($clean_answer) . '</div>';
+                echo '</li>';
+            }
+
+            echo '</ul>';
+            echo '</section>';
+
+            return ob_get_clean();
+        }
+    }
+
+    return '';
+}
+add_shortcode('category_faq', 'render_category_faq');
