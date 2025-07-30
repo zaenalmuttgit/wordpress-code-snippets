@@ -9,7 +9,10 @@ This repository contains custom PHP snippets I've written for WordPress projects
 - Redirect Product Feed
 - Shortcode for dinamic FAQ Category
 - Schema Markup for FAQ in Product Category
+
+# HTML
 - HTML for Search Toggle
+- HTML Cart count
 
 Each snippet is tested and optimized for performance and security.
 
