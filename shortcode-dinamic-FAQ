@@ -1,0 +1,40 @@
+function render_product_category_faq() {
+    $product_id = get_the_ID();
+    $categories = get_the_terms($product_id, 'product_cat');
+
+    if ($categories && !is_wp_error($categories)) {
+        foreach ($categories as $category) {
+            if (have_rows('faq_list', 'term_' . $category->term_id)) {
+                ob_start();
+                echo '<section class="product-faq">';
+                echo '<ul class="faq-list">';
+
+                while (have_rows('faq_list', 'term_' . $category->term_id)) {
+                    the_row();
+                    $question = get_sub_field('question');
+                    $answer = get_sub_field('answer');
+
+                    // Skip if empty
+                    if (empty(trim($question)) || empty(trim(strip_tags($answer)))) {
+                        continue;
+                    }
+
+                    $clean_answer = preg_replace('/<p>(\s|&nbsp;|<br\s*\/?>|\.)*<\/p>/i', '', $answer);
+
+                    echo '<li class="faq-item">';
+                    echo '<strong>' . esc_html($question) . '</strong>';
+                    echo '<div class="faq-answer">' . wp_kses_post($clean_answer) . '</div>';
+                    echo '</li>';
+                }
+
+                echo '</ul>';
+                echo '</section>';
+
+                return ob_get_clean();
+            }
+        }
+    }
+
+    return ''; // If there is no FAQ
+}
+add_shortcode('product_category_faq', 'render_product_category_faq');
