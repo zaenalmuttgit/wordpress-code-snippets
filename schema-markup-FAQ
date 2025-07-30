@@ -1,0 +1,46 @@
+function render_category_faq_schema() {
+    if (!is_product_category()) {
+        return;
+    }
+
+    $term = get_queried_object();
+
+    if (!$term || !have_rows('faq_list_category', 'term_' . $term->term_id)) {
+        return;
+    }
+
+    $faqs = [];
+
+    while (have_rows('faq_list_category', 'term_' . $term->term_id)) {
+        the_row();
+        $question = get_sub_field('question_category');
+        $answer = get_sub_field('answer_category');
+
+        if (empty(trim($question)) || empty(trim(strip_tags($answer)))) {
+            continue;
+        }
+
+        $clean_answer = strip_tags($answer);
+        $faqs[] = [
+            '@type' => 'Question',
+            'name' => $question,
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => $clean_answer
+            ]
+        ];
+    }
+
+    if (empty($faqs)) {
+        return;
+    }
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => $faqs
+    ];
+
+    echo '<script type="application/ld+json">' . wp_json_encode($schema) . '</script>';
+}
+add_action('wp_footer', 'render_category_faq_schema');
