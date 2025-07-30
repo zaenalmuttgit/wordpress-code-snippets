@@ -5,6 +5,7 @@ This repository contains custom PHP snippets I've written for WordPress projects
 - Create homepage breadcumb hidden
 - Shortcode for dinamic FAQ on Product Category
 - Inject Product Schema Markup
+- Add X-Content-Type-Options
 
 Each snippet is tested and optimized for performance and security.
 
