@@ -1,2 +1,7 @@
-# wordpress-code-snippets
-Code to make url 410 Gone
+# WordPress Custom Code Snippets
+
+This repository contains custom PHP snippets I've written for WordPress projects, including:
+- 410 Gone Old URLs
+
+Each snippet is tested and optimized for performance and security.
+
