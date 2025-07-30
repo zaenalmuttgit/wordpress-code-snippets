@@ -1,0 +1,11 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.querySelector('.search-form-container form');
+  if (form) {
+    // Hapus param milik Elementor jika ada
+    const existing = form.querySelector('input[name="e_search_props"]');
+    if (existing) existing.remove();
+
+  }
+});
+</script>
