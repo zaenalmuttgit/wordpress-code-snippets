@@ -1,0 +1,6 @@
+add_action('template_redirect', function () {
+    if (is_singular('product') && is_feed()) {
+        wp_redirect(get_permalink(), 301);
+        exit;
+    }
+});
