@@ -16,6 +16,6 @@ This repository contains custom PHP snippets I've written for WordPress projects
 
 # CSS
 - css cart icon
-
+- css search icon
 Each snippet is tested and optimized for performance and security.
 
