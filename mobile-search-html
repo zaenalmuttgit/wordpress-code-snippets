@@ -1,0 +1,3 @@
+<form class="mobile-product-search" role="search" method="get" action="https://blackdop.com/">
+  <input type="search" name="s" placeholder="Search products…" required />
+</form>
