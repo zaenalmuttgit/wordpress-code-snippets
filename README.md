@@ -1,2 +1,2 @@
-# wordpress-code-snippets-410-url
+# wordpress-code-snippets
 Code to make url 410 Gone
