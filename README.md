@@ -14,5 +14,8 @@ This repository contains custom PHP snippets I've written for WordPress projects
 - HTML for Search Toggle
 - HTML Cart count
 
+# CSS
+- css cart icon
+
 Each snippet is tested and optimized for performance and security.
 
