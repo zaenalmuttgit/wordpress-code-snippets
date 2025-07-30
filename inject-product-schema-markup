@@ -1,0 +1,130 @@
+add_action('wp_footer', 'inject_product_schema_with_shipping_snippet', 20);
+function inject_product_schema_with_shipping_snippet() {
+    if ( ! is_product() ) return;
+
+    global $post;
+    $product = wc_get_product( $post->ID );
+    if ( ! $product || ! is_a( $product, 'WC_Product' ) ) return;
+
+    $terms = get_the_terms( $product->get_id(), 'product_cat' );
+    $category_name = $terms && ! is_wp_error( $terms ) ? $terms[0]->name : '';
+
+    $shipping_rates = [
+        'AirPods Case' => [ 'US' => 0, 'ROW' => 6 ],
+        'Apple Watch Band' => [ 'US' => 0, 'ROW' => 6 ],
+        'Hoodie' => [ 'US' => 0, 'AU' => 13, 'CA' => 4, 'ROW' => 6 ],
+        'Keyring Tag' => [ 'US' => 0, 'DE' => 0, 'GB' => 0, 'AU' => 3, 'NZ' => 3, 'CA' => 12, 'ROW' => 11 ],
+        'Kids T-Shirt' => [ 'US' => 0, 'AU' => 7, 'ROW' => 5 ],
+        'Luggage Tag' => [ 'US' => 0, 'CA' => 5, 'ROW' => 6 ],
+        'Lunch Bag' => [ 'US' => 0, 'GB' => 0, 'AU' => 3, 'ROW' => 15 ],
+        'Magnet' => [ 'US' => 0, 'ROW' => 4 ],
+        'Mouse Pad' => [ 'US' => 0, 'GB' => 0, 'AU' => 4, 'ROW' => 17 ],
+        'Mug' => [ 'US' => 0, 'AU' => 13, 'CA' => 6, 'ROW' => 7 ],
+        'Passport Cover' => [ 'US' => 0, 'GB' => 0, 'ROW' => 16 ],
+        'Pet Tag' => [ 'US' => 0, 'CA' => 5, 'ROW' => 4 ],
+        'Pop-able Phone Stands' => [ 'US' => 0, 'ROW' => 6 ],
+        'Poster' => [ 'US' => 0, 'ROW' => 3 ],
+        'Quartz Watch' => [ 'US' => 0, 'ROW' => 0 ],
+        'Socks' => [ 'US' => 0, 'CA' => 4, 'ROW' => 9 ],
+        'T-Shirt' => [ 'US' => 0, 'AU' => 8, 'ROW' => 5 ],
+        'Tapestry' => [ 'US' => 0, 'DE' => 0, 'ROW' => 6 ],
+        'Tote Bag' => [ 'US' => 0, 'DE' => 0, 'ROW' => 5 ],
+        'Velveteen Plush Blanket' => [ 'US' => 0, 'CA' => 6, 'ROW' => 21 ]
+    ];
+
+    $delivery_times = [
+        'AirPods Case' => ['US' => '2-5', 'ROW' => '7-12'],
+        'Apple Watch Band' => ['US' => '2-5', 'ROW' => '10-30'],
+        'Hoodie' => ['US' => '2-5', 'AU' => '10-30', 'CA' => '10-30', 'ROW' => '10-30'],
+        'Keyring Tag' => ['US' => '2-5', 'DE' => '2-5', 'GB' => '2-5', 'AU' => '3-6', 'NZ' => '3-6', 'CA' => '5-15', 'ROW' => '10-30'],
+        'Kids T-Shirt' => ['US' => '2-5', 'AU' => '10-30', 'ROW' => '10-30'],
+        'Luggage Tag' => ['US' => '2-5', 'CA' => '10-30', 'ROW' => '10-30'],
+        'Lunch Bag' => ['US' => '2-5', 'GB' => '2-5', 'AU' => '3-6', 'ROW' => '10-30'],
+        'Magnet' => ['US' => '2-5', 'ROW' => '10-30'],
+        'Mouse Pad' => ['US' => '2-5', 'GB' => '2-4', 'AU' => '3-6', 'ROW' => '10-30'],
+        'Mug' => ['US' => '2-5', 'AU' => '10-30', 'CA' => '10-30', 'ROW' => '10-30'],
+        'Passport Cover' => ['US' => '2-5', 'GB' => '2-5', 'ROW' => '10-30'],
+        'Pet Tag' => ['US' => '2-5', 'CA' => '10-30', 'ROW' => '10-30'],
+        'Pop-able Phone Stands' => ['US' => '2-5', 'ROW' => '7-12'],
+        'Poster' => ['US' => '2-5', 'ROW' => '10-30'],
+        'Quartz Watch' => ['US' => '7-15', 'ROW' => '7-15'],
+        'Socks' => ['US' => '2-5', 'CA' => '10-30', 'ROW' => '10-30'],
+        'T-Shirt' => ['US' => '2-5', 'AU' => '10-30', 'ROW' => '10-30'],
+        'Tapestry' => ['US' => '2-5', 'DE' => '2-4', 'ROW' => '10-30'],
+        'Tote Bag' => ['US' => '2-5', 'DE' => '2-4', 'ROW' => '10-30'],
+        'Velveteen Plush Blanket' => ['US' => '2-5', 'CA' => '10-30', 'ROW' => '10-30']
+    ];
+
+    $shipping_details = [];
+
+    if ( isset($shipping_rates[$category_name]) ) {
+        foreach ( $shipping_rates[$category_name] as $country_code => $rate ) {
+            $delivery = isset($delivery_times[$category_name][$country_code]) ? $delivery_times[$category_name][$country_code] : null;
+            $region_code = $country_code === 'ROW' ? 'ZZ' : $country_code;
+            $detail = [
+                "@type" => "OfferShippingDetails",
+                "shippingDestination" => [
+                    "@type" => "DefinedRegion",
+                    "addressCountry" => $region_code
+                ],
+                "shippingRate" => [
+                    "@type" => "MonetaryAmount",
+                    "value" => number_format($rate, 2),
+                    "currency" => get_woocommerce_currency()
+                ]
+            ];
+            if ($delivery) {
+                $range = explode('-', $delivery);
+                $detail["deliveryTime"] = [
+                    "@type" => "ShippingDeliveryTime",
+                    "handlingTime" => [
+                        "@type" => "QuantitativeValue",
+                        "minValue" => 0,
+                        "maxValue" => 1,
+                        "unitCode" => "d"
+                    ],
+                    "transitTime" => [
+                        "@type" => "QuantitativeValue",
+                        "minValue" => (int) $range[0],
+                        "maxValue" => (int) $range[1],
+                        "unitCode" => "d"
+                    ]
+                ];
+            }
+            $shipping_details[] = $detail;
+        }
+    }
+
+    $schema = [
+        "@context" => "https://schema.org/",
+        "@type" => "Product",
+        "name" => get_the_title(),
+        "image" => wp_get_attachment_url( $product->get_image_id() ),
+        "description" => mb_strlen( wp_strip_all_tags( get_the_content() ) ) > 200
+            ? mb_substr( wp_strip_all_tags( get_the_content() ), 0, 197 ) . '...'
+            : wp_strip_all_tags( get_the_content() ),
+        "sku" => $product->get_sku(),
+        "brand" => [
+            "@type" => "Brand",
+            "name" => get_bloginfo('name')
+        ],
+        "offers" => [
+            "@type" => "Offer",
+            "url" => get_permalink(),
+            "priceCurrency" => get_woocommerce_currency(),
+            "price" => $product->get_price(),
+            "availability" => $product->is_in_stock() ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "itemCondition" => "https://schema.org/NewCondition",
+            "shippingDetails" => $shipping_details,
+            "hasMerchantReturnPolicy" => [
+                "@type" => "MerchantReturnPolicy",
+                "applicableCountry" => "ZZ",
+                "returnPolicyCategory" => "https://schema.org/MerchantReturnFiniteReturnWindow",
+                "merchantReturnDays" => 30,
+                "returnMethod" => "https://schema.org/ReturnByMail"
+            ]
+        ]
+    ];
+
+    echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>';
+}
