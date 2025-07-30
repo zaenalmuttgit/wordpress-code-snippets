@@ -1,0 +1,16 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function updateCartCount() {
+    if (typeof wc_cart_fragments_params !== 'undefined') {
+      jQuery.get(wc_cart_fragments_params.wc_ajax_url.replace("%%endpoint%%", "get_refreshed_fragments"), function (data) {
+        const html = data.fragments && data.fragments["div.widget_shopping_cart_content"];
+        const match = html && html.innerHTML.match(/class="quantity">(\d+)<\/span>/);
+        const count = match ? parseInt(match[1]) : 0;
+        const el = document.querySelector('.custom-cart-icon');
+        if (el) el.setAttribute('data-count', count);
+      });
+    }
+  }
+  setTimeout(updateCartCount, 500);
+});
+</script>
